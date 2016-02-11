@@ -22,7 +22,7 @@
 		"languages": [{
 			"id": "erlang",
 			"aliases": ["Erlang", "erlang"],
-			"extensions": [".erl",".hrl",".escript", ".app.src"],
+			"extensions": [".erl", ".hrl", ".yrl", ".escript", ".app.src"],
             "filenamePatterns": [
                 "*.app.src"
             ],
