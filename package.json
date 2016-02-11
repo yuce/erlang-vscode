@@ -1,14 +1,18 @@
 {
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
-	"description": "Erlang/OTP Support",
+	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
 	"version": "0.1.0",
+    "author": {
+        "name": "Yuce Tekol"
+    },
 	"publisher": "yuce",
 	"engines": {
 		"vscode": "^0.10.6"
 	},
 	"categories": [
-		"Other"
+		"Languages",
+        "Snippets"
 	],
 	"activationEvents": [
 		"onLanguage:erlang"
@@ -41,5 +45,10 @@
 	"devDependencies": {
 		"typescript": "^1.7.5",
 		"vscode": "^0.11.0"
-	}
+	},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yuce/erlang-vscode"
+    },
+    "icon": "images/erlang.png"
 }
