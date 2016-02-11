@@ -1,0 +1,59 @@
+{
+    "rec": {
+        "prefix": "rec",
+        "body": [
+            "receive",
+            "\t$1 ->",
+            "\t\t$2",
+            "end$3"
+        ],
+        "description": "Receive"
+    },
+    "reca": {
+        "prefix": "reca",
+        "body": [
+            "receive",
+            "\t$1 ->",
+            "\t\t$2",
+            "after $3 ->",
+            "\t$4",
+            "end$5"
+        ],
+        "description": "Receive with after"
+    },
+    "case": {
+        "prefix": "case",
+        "body": [
+        "case $1 of",
+        "\t$2 ->",
+            "\t\t$3",
+            "end$4"
+        ],
+        "description": "Case"
+    },
+    "if": {
+        "prefix": "if",
+        "body": [
+            "if",
+            "\t$1 ->",
+            "\t\t$2",
+            "\ttrue ->",
+            "\t\t$3",
+            "end$4"
+        ],
+        "description": "If"
+    },
+    "try": {
+        "prefix": "try",
+        "body": [
+            "try $1 of",
+            "\t$1 ->",
+            "\t\t$2",
+            "catch",
+            "\t$3 ->",
+            "\t\t$4",
+            "end$5"
+        ],
+        "description": "Try, catch"
+    }
+}

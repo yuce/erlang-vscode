@@ -1,0 +1,45 @@
+{
+	"name": "erlang-otp",
+	"displayName": "Erlang/OTP",
+	"description": "Erlang/OTP Support",
+	"version": "0.1.0",
+	"publisher": "yuce",
+	"engines": {
+		"vscode": "^0.10.6"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:erlang"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"languages": [{
+			"id": "erlang",
+			"aliases": ["Erlang", "erlang"],
+			"extensions": [".erl",".hrl",".escript"],
+			"configuration": "./erlang.configuration.json"
+		}],
+		"grammars": [{
+			"language": "erlang",
+			"scopeName": "source.erlang",
+			"path": "./syntaxes/erlang.tmLanguage"
+		}],
+        "snippets": [
+            {
+                "language": "erlang",
+                "path": "./snippets/erlang.json"
+            }
+        ]
+	},
+	"scripts": {
+		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"devDependencies": {
+		"typescript": "^1.7.5",
+		"vscode": "^0.11.0"
+	}
+}
