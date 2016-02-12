@@ -35,7 +35,7 @@ import {range, debounce} from 'lodash';
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
         indentationRules: {
-            increaseIndentPattern: /^\s*([^%]+.*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
+            increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
             decreaseIndentPattern: null,
         },
         comments: {
@@ -51,7 +51,7 @@ export function activate(ctx: ExtensionContext) {
 				{ open: '{', close: '}' },
 				{ open: '[', close: ']' },
 				{ open: '(', close: ')' },
-				{ open: '<<', close: '>>', notIn: ['string'] },
+				{ open: '<<', close: '>>', notIn: ['string', 'comment'] },
 				{ open: '"', close: '"', notIn: ['string'] },
 				{ open: '\'', close: '\'', notIn: ['string', 'comment'] }
 			]
