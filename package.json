@@ -16,17 +16,16 @@
         "Snippets"
 	],
 	"activationEvents": [
-		"onLanguage:erlang",
-        "workspaceContains:rebar.config"
+		"onLanguage:erlang"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
 		"languages": [{
 			"id": "erlang",
 			"aliases": ["Erlang", "erlang"],
-			"extensions": [".erl", ".hrl", ".yrl", ".escript", ".app.src"],
-            "filenamePatterns": [
-                "*.app.src"
+			"extensions": [".erl", ".hrl", ".yrl", ".escript", ".app.src", ".config"],
+            "filenames": [
+                "rebar.lock"
             ]
 		}],
 		"grammars": [{

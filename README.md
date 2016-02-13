@@ -1,6 +1,6 @@
 # Erlang/OTP Support for Visual Studio Code
 
-This extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/)
+This extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/).
 
 ## Features
 
