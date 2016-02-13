@@ -2,7 +2,7 @@
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
 	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
-	"version": "0.1.2",
+	"version": "0.1.3",
     "author": {
         "name": "Yuce Tekol"
     },
