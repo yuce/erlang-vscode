@@ -1,5 +1,5 @@
 {
-    "rec": {
+    "receive": {
         "prefix": "rec",
         "body": [
             "receive",
@@ -7,9 +7,9 @@
             "\t\t$2",
             "end$3"
         ],
-        "description": "Receive"
+        "description": "receive block"
     },
-    "reca": {
+    "receive with after": {
         "prefix": "reca",
         "body": [
             "receive",
@@ -19,7 +19,7 @@
             "\t$4",
             "end$5"
         ],
-        "description": "Receive with after"
+        "description": "receive block with after"
     },
     "case": {
         "prefix": "case",
@@ -29,7 +29,7 @@
             "\t\t$3",
             "end$4"
         ],
-        "description": "Case"
+        "description": "case block"
     },
     "if": {
         "prefix": "if",
@@ -41,7 +41,7 @@
             "\t\t$3",
             "end$4"
         ],
-        "description": "If"
+        "description": "if block"
     },
     "try": {
         "prefix": "try",
@@ -54,6 +54,6 @@
             "\t\t$4",
             "end$5"
         ],
-        "description": "Try, catch"
+        "description": "try .. catch block"
     }
 }
