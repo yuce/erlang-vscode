@@ -29,14 +29,16 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'use strict';
-import {ExtensionContext, Disposable, workspace, window, languages, Hover} from 'vscode';
-import {range, debounce} from 'lodash';
+import {ExtensionContext, Disposable, workspace, window, languages,
+        Hover} from 'vscode';
+import {ErlangCompletionProvider} from './completion_provider';
+// import {range, debounce} from 'lodash';
 
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
         indentationRules: {
             increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
-            decreaseIndentPattern: null,
+            decreaseIndentPattern: /^.*(;|\.)\s*$/,
         },
         comments: {
             lineComment: '%'
@@ -44,7 +46,8 @@ export function activate(ctx: ExtensionContext) {
         brackets: [
             ['{', '}'],
             ['[', ']'],
-            ['(', ')']
+            ['(', ')'],
+            ['<<', '>>']
         ],
         __characterPairSupport: {
 			autoClosingPairs: [
@@ -57,6 +60,10 @@ export function activate(ctx: ExtensionContext) {
 			]
 		}
     });
+    let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+    ctx.subscriptions.push(languages.registerCompletionItemProvider({
+        language: 'erlang'
+    }, new ErlangCompletionProvider(completionJsonPath), ':'));
 
 }
 
