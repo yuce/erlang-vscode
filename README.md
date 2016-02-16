@@ -6,7 +6,7 @@ This extension provides Erlang/OTP support for [Visual Studio Code](https://code
 
 * 2016-02-16: Added experimental support for auto-completion of Erlang standard library modules.
 (*Currenty only for stdlib application modules*). Enable it with
-setting `erlang.enableExperimentalAutoComplete` in your user settings.
+setting `erlang.enableExperimentalAutoComplete` in your user settings and restart VSCode.
 
 ## Features
 
