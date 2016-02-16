@@ -60,11 +60,15 @@ export function activate(ctx: ExtensionContext) {
 			]
 		}
     });
-    let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
-    ctx.subscriptions.push(languages.registerCompletionItemProvider({
-        language: 'erlang'
-    }, new ErlangCompletionProvider(completionJsonPath), ':'));
 
+    // enable auto completion
+    let config = workspace.getConfiguration('erlang');
+    if (config['enableExperimentalAutoComplete']) {
+        let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+        ctx.subscriptions.push(languages.registerCompletionItemProvider({
+            language: 'erlang'
+        }, new ErlangCompletionProvider(completionJsonPath), ':'));
+    }
 }
 
 export function deactivate() {
