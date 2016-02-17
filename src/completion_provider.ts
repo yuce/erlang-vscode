@@ -15,6 +15,7 @@ interface FunctionCompletionData {
 
 export class ErlangCompletionProvider implements CompletionItemProvider {
     private modules:any = null;
+    private moduleNames: string[] = null;
 
     constructor(private completionPath: string) {}
 
@@ -25,41 +26,59 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         return new Promise<CompletionItem[]>((resolve, reject) => {
 	        const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
-            if (m === null) {
-                resolve([]);
+            if (this.modules === null) {
+                this.readCompletionJson(this.completionPath, modules => {
+                    this.modules = modules;
+                    (m === null)?
+                        this.resolveModuleNames(resolve)
+                        : this.resolveFunNames(m[1], resolve);
+                });
             }
             else {
-                const module = m[1];
-                console.log('module', module);
-                if (this.modules === null) {
-                    this.readCompletionJson(this.completionPath, modules => {
-                        this.modules = modules;
-                        this.resolveItems(module, resolve);
-                    });
-                }
-                else {
-                    this.resolveItems(module, resolve);
-                }
+                (m === null)?
+                    this.resolveModuleNames(resolve)
+                    : this.resolveFunNames(m[1], resolve);
             }
         });
     }
 
-    private resolveItems(module, resolve) {
-	   resolve(this.makeModuleCompletion(module));
+    private resolveFunNames(module, resolve) {
+	   resolve(this.makeModuleFunsCompletion(module));
     }
 
-    private makeFunctionCompletionItem(module: string, name: string): CompletionItem {
+    private resolveModuleNames(resolve) {
+        resolve(this.makeModuleNamesCompletion());
+    }
+
+    private makeFunctionCompletionItem(name: string): CompletionItem {
         const item = new CompletionItem(name);
         // item.documentation = cd.detail;
         item.kind = CompletionItemKind.Function;
-
         return item;
     }
 
-    private makeModuleCompletion(module: string): CompletionItem[] {
+    private makeModuleNameCompletionItem(name: string): CompletionItem {
+        const item = new CompletionItem(name);
+        item.kind = CompletionItemKind.Module;
+        return item;
+    }
+
+    private makeModuleFunsCompletion(module: string): CompletionItem[] {
         const moduleFuns = this.modules[module] || [];
         return moduleFuns.map(name => {
-            return this.makeFunctionCompletionItem(module, name);
+            return this.makeFunctionCompletionItem(name);
+        });
+    }
+
+    private makeModuleNamesCompletion(): CompletionItem[] {
+        const modules = this.modules || {};
+        const names = [];
+        for (let k in modules) {
+            names.push(k);
+        }
+        names.sort();
+        return names.map(name => {
+            return this.makeModuleNameCompletionItem(name);
         });
     }
 
