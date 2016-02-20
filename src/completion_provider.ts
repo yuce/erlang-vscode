@@ -16,6 +16,7 @@ interface FunctionCompletionData {
 export class ErlangCompletionProvider implements CompletionItemProvider {
     private modules:any = null;
     private moduleNames: string[] = null;
+    private genericCompletionItems: CompletionItem[] = null;
 
     constructor(private completionPath: string) {}
 
@@ -47,7 +48,10 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     }
 
     private resolveModuleNames(resolve) {
-        resolve(this.makeModuleNamesCompletion());
+        if (!this.genericCompletionItems) {
+            this.genericCompletionItems = this.makeGenericCompletion();
+        }
+        resolve(this.genericCompletionItems);
     }
 
     private makeFunctionCompletionItem(name: string): CompletionItem {
@@ -70,7 +74,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         });
     }
 
-    private makeModuleNamesCompletion(): CompletionItem[] {
+    private makeGenericCompletion(): CompletionItem[] {
         const modules = this.modules || {};
         const names = [];
         for (let k in modules) {
