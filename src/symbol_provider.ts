@@ -18,6 +18,7 @@ export class ErlangSymbolProvider implements DocumentSymbolProvider {
     }
 
     private resolveGenericItems(resolve, symbols: Symbols) {
+        // TODO: sort symbols by name
         let vsSymbols: SymbolInformation[] = symbols.functions.map(f => {
             let range = new Range(f.line - 1, 0, f.line - 1, 0);
             return new SymbolInformation(`${f.name}/${f.arity}`, SymbolKind.Function, range);

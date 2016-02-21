@@ -43,26 +43,25 @@ export class WhatelsClient implements Disposable {
             }
             else {
                 this.wConn = new whatels.Connection();
-                this.wConn.connect(err => {
-                    err? reject(err) : resolve(this.wConn);
-                });
+                this.wConn.connect().then(
+                    () => resolve(this.wConn),
+                    err => reject(err)
+                );
             }
-        })
+        });
     }
 
     private _getSymbols(path: string, text: string): Thenable<whatels.Symbols> {
         return new Promise<whatels.Symbols>((resolve, reject) => {
             this._connect().then(conn => {
-                conn.getSymbols(text, (err, symbols) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
+                conn.getSymbols(text).then(
+                    symbols => {
                         const now = (new Date()).getTime();
                         this.pathSymbols[path] = {updated: now, symbols: symbols};
                         resolve(symbols);
-                    }
-                });
+                    },
+                    err => reject(err)
+                );
             },
             err => reject(err));
         });
