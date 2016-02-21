@@ -32,7 +32,8 @@
 import {ExtensionContext, Disposable, workspace, window, languages,
         Hover} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
-// import {range, debounce} from 'lodash';
+import {ErlangSymbolProvider} from './symbol_provider';
+
 
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
@@ -68,6 +69,10 @@ export function activate(ctx: ExtensionContext) {
         ctx.subscriptions.push(languages.registerCompletionItemProvider({
             language: 'erlang'
         }, new ErlangCompletionProvider(completionJsonPath), ':'));
+        console.log('registering symbol provider');
+        ctx.subscriptions.push(languages.registerDocumentSymbolProvider({
+            language: 'erlang'
+        }, new ErlangSymbolProvider()));
     }
 }
 

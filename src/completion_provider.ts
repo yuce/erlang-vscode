@@ -54,7 +54,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
                     });
                 }
                 else {
-                    this.wConn.getSymbols(doc.fileName, (err, symbols) => {
+                    this.wConn.getSymbols(doc.getText(), (err, symbols) => {
                         console.log('symbols: ', symbols);
                         this.resolveGenericItems(resolve, symbols.functions)
                     });
