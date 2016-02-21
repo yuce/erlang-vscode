@@ -3,9 +3,9 @@
 
 import {CompletionItemProvider, TextDocument, Position, CancellationToken,
         CompletionItem, CompletionItemKind} from 'vscode';
-
 import fs = require('fs');
-import whatels = require('whatels');
+import {Symbols, FunctionInfo} from 'whatels';
+import {WhatelsClient} from './whatels_client';
 
 const RE_MODULE = /(\w+):$/;
 
@@ -18,9 +18,9 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private modules:any = null;
     private moduleNames: string[] = null;
     private genericCompletionItems: CompletionItem[] = null;
-    private wConn: whatels.Connection = null;
 
-    constructor(private completionPath: string) {}
+    constructor(private whatelsClient: WhatelsClient,
+                private completionPath: string) {}
 
     public provideCompletionItems(doc: TextDocument,
                                   pos: Position,
@@ -30,35 +30,10 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 	        const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
             if (m === null) {
-                if (this.wConn === null) {
-                    this.wConn = new whatels.Connection();
-                    this.wConn.connect((error: any) => {
-                        if (error) {
-                            this.wConn = null;
-                            console.error(error);
-                            reject();
-                        }
-                        else {
-                            console.log('Connnected to whatels service.');
-                            this.wConn.getSymbols(doc.fileName, (err, symbols) => {
-                                if (err) {
-                                    console.error(err);
-                                    reject();
-                                }
-                                else {
-                                    console.log('symbols: ', symbols);
-                                    this.resolveGenericItems(resolve, symbols.functions)
-                                }
-                            });
-                        }
-                    });
-                }
-                else {
-                    this.wConn.getSymbols(doc.getText(), (err, symbols) => {
-                        console.log('symbols: ', symbols);
-                        this.resolveGenericItems(resolve, symbols.functions)
-                    });
-                }
+                this.whatelsClient.getSymbols(doc.fileName, doc.getText()).then(
+                    symbols => this.resolveGenericItems(resolve, symbols.functions),
+                    err => reject(err)
+                );
             }
             else {
                 if (this.modules === null) {
@@ -106,7 +81,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         });
     }
 
-    private makeGenericCompletion(funs: whatels.FunctionInfo[]): CompletionItem[] {
+    private makeGenericCompletion(funs: FunctionInfo[]): CompletionItem[] {
         let comps: CompletionItem[] = funs.map(f => {
             return this.makeFunctionCompletionItem(f.name);
         });
@@ -124,7 +99,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     }
 
     private readCompletionJson(filename: string, done: Function): any {
-        fs.readFile(filename, (err, data) => {
+        fs.readFile(filename, 'utf8', (err, data) => {
             if (err) {
                 console.log(`Cannot read: ${filename}`);
                 done({});

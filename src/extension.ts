@@ -33,6 +33,7 @@ import {ExtensionContext, Disposable, workspace, window, languages,
         Hover} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
 import {ErlangSymbolProvider} from './symbol_provider';
+import {WhatelsClient} from './whatels_client';
 
 
 export function activate(ctx: ExtensionContext) {
@@ -65,14 +66,16 @@ export function activate(ctx: ExtensionContext) {
     // enable auto completion
     let config = workspace.getConfiguration('erlang');
     if (config['enableExperimentalAutoComplete']) {
+        let whatelsClient = new WhatelsClient();
+        ctx.subscriptions.push(whatelsClient);
         let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
         ctx.subscriptions.push(languages.registerCompletionItemProvider({
             language: 'erlang'
-        }, new ErlangCompletionProvider(completionJsonPath), ':'));
-        console.log('registering symbol provider');
+        }, new ErlangCompletionProvider(whatelsClient, completionJsonPath), ':'));
         ctx.subscriptions.push(languages.registerDocumentSymbolProvider({
             language: 'erlang'
-        }, new ErlangSymbolProvider()));
+        }, new ErlangSymbolProvider(whatelsClient)));
+
     }
 }
 
