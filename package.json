@@ -2,7 +2,7 @@
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
 	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
-	"version": "0.2.1",
+	"version": "0.2.2",
     "author": {
         "name": "Yuce Tekol"
     },
@@ -60,7 +60,8 @@
 		"vscode": "^0.11.0"
 	},
     "dependencies": {
-        "whatels": "^0.1.0"
+        "whatels": "^0.1.2",
+        "tmp": "^0.0.28"
     },
     "repository": {
         "type": "git",

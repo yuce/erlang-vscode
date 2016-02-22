@@ -21,7 +21,10 @@ export class ErlangSymbolProvider implements DocumentSymbolProvider {
         // TODO: sort symbols by name
         let vsSymbols: SymbolInformation[] = symbols.functions.map(f => {
             let range = new Range(f.line - 1, 0, f.line - 1, 0);
-            return new SymbolInformation(`${f.name}/${f.arity}`, SymbolKind.Function, range);
+            let name = symbols.module?
+                `${symbols.module}:${f.name}/${f.arity}`
+                : `${f.name}/${f.arity}`;
+            return new SymbolInformation(name, SymbolKind.Function, range);
         });
         resolve(vsSymbols);
     }

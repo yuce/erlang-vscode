@@ -56,6 +56,7 @@ export class WhatelsClient implements Disposable {
             this._connect().then(conn => {
                 conn.getSymbols(text).then(
                     symbols => {
+                        console.log('SYMBOLS!!! ', symbols);
                         const now = (new Date()).getTime();
                         this.pathSymbols[path] = {updated: now, symbols: symbols};
                         resolve(symbols);
