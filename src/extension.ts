@@ -66,19 +66,24 @@ export function activate(ctx: ExtensionContext) {
     // enable auto completion
     let config = workspace.getConfiguration('erlang');
     if (config['enableExperimentalAutoComplete']) {
-        let whatelsClient = new WhatelsClient();
+        const whatelsClient = createWhatelsClient(workspace.rootPath);
         ctx.subscriptions.push(whatelsClient);
-        let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+        const completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
         ctx.subscriptions.push(languages.registerCompletionItemProvider({
             language: 'erlang'
         }, new ErlangCompletionProvider(whatelsClient, completionJsonPath), ':'));
         ctx.subscriptions.push(languages.registerDocumentSymbolProvider({
             language: 'erlang'
         }, new ErlangSymbolProvider(whatelsClient)));
-
     }
 }
 
 export function deactivate() {
 }
 
+function createWhatelsClient(rootPath: string) {
+    const wc = new WhatelsClient();
+    wc.watch(`${rootPath}/src/*.erl`);
+    wc.watch(`${rootPath}/apps/**/src/*.erl`);
+    return wc;
+}

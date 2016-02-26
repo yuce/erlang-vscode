@@ -10,8 +10,11 @@ export class ErlangSymbolProvider implements DocumentSymbolProvider {
     public provideDocumentSymbols(doc: TextDocument, token: CancellationToken): Thenable<SymbolInformation[]> {
         return new Promise<SymbolInformation[]>((resolve, reject) => {
             console.log('get symbol informations');
-            this.whatelsClient.getSymbols(doc.fileName, doc.getText()).then(
-                symbols => this.resolveGenericItems(resolve, symbols),
+            this.whatelsClient.getPathSymbols(doc.fileName).then(
+                symbols => {
+                    console.log(`path: ${doc.fileName}, symbols: ${symbols}`);
+                    symbols? this.resolveGenericItems(resolve, symbols) : reject()
+                },
                 err => reject(err)
             )
         });

@@ -3,19 +3,15 @@
 
 import {CompletionItemProvider, TextDocument, Position, CancellationToken,
         CompletionItem, CompletionItemKind} from 'vscode';
-import fs = require('fs');
 import {Symbols, FunctionInfo} from 'whatels';
 import {WhatelsClient} from './whatels_client';
+import fs = require('fs');
+import path = require('path');
 
 const RE_MODULE = /(\w+):$/;
 
-interface FunctionCompletionData {
-    name: string;
-    // detail: string;
-}
-
 export class ErlangCompletionProvider implements CompletionItemProvider {
-    private modules:any = null;
+    private stdModules:any = null;
     private moduleNames: string[] = null;
     private genericCompletionItems: CompletionItem[] = null;
 
@@ -30,21 +26,30 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 	        const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
             if (m === null) {
-                this.whatelsClient.getSymbols(doc.fileName, doc.getText()).then(
-                    symbols => this.resolveGenericItems(resolve, symbols.functions),
+                this.whatelsClient.getAllPathSymbols().then(
+                    pathSymbols => {
+                        pathSymbols?
+                            this.resolveGenericItems(resolve, pathSymbols)
+                            : reject();
+                    },
                     err => reject(err)
                 );
             }
             else {
-                if (this.modules === null) {
-                    this.readCompletionJson(this.completionPath, modules => {
-                        this.modules = modules;
-                        this.resolveFunNames(m[1], resolve);
-                    });
-                }
-                else {
-                    this.resolveFunNames(m[1], resolve);
-                }
+                const moduleName = m[1];
+                this.whatelsClient.getAllPathSymbols().then(
+                    pathSymbols => this.resolveModuleItems(resolve, moduleName, pathSymbols),
+                    err => reject(err)
+                );
+                // if (this.stdModules === null) {
+                //     this.readCompletionJson(this.completionPath, modules => {
+                //         this.stdModules = modules;
+                //         this.resolveFunNames(m[1], resolve);
+                //     });
+                // }
+                // else {
+                //     this.resolveFunNames(m[1], resolve);
+                // }
             }
         });
     }
@@ -53,12 +58,12 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 	   resolve(this.makeModuleFunsCompletion(module));
     }
 
-    private resolveGenericItems(resolve, funs) {
-        resolve(this.makeGenericCompletion(funs));
-        // if (!this.genericCompletionItems) {
-        //     this.genericCompletionItems = this.makeGenericCompletion([]);
-        // }
-        // resolve(this.genericCompletionItems);
+    private resolveGenericItems(resolve, pathSymbols) {
+        resolve(this.makeGenericCompletion(pathSymbols));
+    }
+
+    private resolveModuleItems(resolve, moduleName, pathSymbols) {
+        resolve(this.makeModuleCompletion(moduleName, pathSymbols));
     }
 
     private makeFunctionCompletionItem(name: string): CompletionItem {
@@ -75,28 +80,58 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     }
 
     private makeModuleFunsCompletion(module: string): CompletionItem[] {
-        const moduleFuns = this.modules[module] || [];
+        const moduleFuns = this.stdModules[module] || [];
         return moduleFuns.map(name => {
             return this.makeFunctionCompletionItem(name);
         });
     }
 
-    private makeGenericCompletion(funs: FunctionInfo[]): CompletionItem[] {
-        let comps: CompletionItem[] = funs.map(f => {
-            return this.makeFunctionCompletionItem(f.name);
-        });
-        const modules = this.modules || {};
-        const names = [];
-        for (let k in modules) {
-            names.push(k);
+    private makeGenericCompletion(pathSymbols: {[index: string]: Symbols}) {
+        let comps: CompletionItem[] = [];
+        for (var p in pathSymbols) {
+            var item = new CompletionItem(path.basename(p, '.erl'));
+            item.kind = CompletionItemKind.Module;
+            comps.push(item);
         }
-        names.sort();
-        names.forEach(name => {
-            comps.push(this.makeModuleNameCompletionItem(name));
-        });
+        return comps;
+    }
+
+    private makeModuleCompletion(moduleName: string,
+                                 pathSymbols: {[index: string]: Symbols})
+    {
+        let comps: CompletionItem[] = [];
+        for (var p in pathSymbols) {
+            if (pathSymbols[p].module == moduleName) {
+                var module = pathSymbols[p];
+                if (module.functions) {
+                    module.functions.forEach(f => {
+                        var item = new CompletionItem(f.name);
+                        item.kind = CompletionItemKind.Function;
+                        comps.push(item);
+                    });
+                }
+            }
+        }
 
         return comps;
     }
+
+    // private makeGenericCompletion(funs: FunctionInfo[]): CompletionItem[] {
+    //     let comps: CompletionItem[] = funs.map(f => {
+    //         return this.makeFunctionCompletionItem(f.name);
+    //     });
+    //     const modules = this.modules || {};
+    //     const names = [];
+    //     for (let k in modules) {
+    //         names.push(k);
+    //     }
+    //     names.sort();
+    //     names.forEach(name => {
+    //         comps.push(this.makeModuleNameCompletionItem(name));
+    //     });
+
+    //     return comps;
+    // }
 
     private readCompletionJson(filename: string, done: Function): any {
         fs.readFile(filename, 'utf8', (err, data) => {

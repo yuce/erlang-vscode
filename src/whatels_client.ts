@@ -2,38 +2,45 @@
 import {Disposable} from 'vscode';
 import whatels = require('whatels');
 
-interface SymbolTimeInfo {
-    symbols: whatels.Symbols;
-    updated: number;
-}
-
 export class WhatelsClient implements Disposable {
-    private pathSymbols = {};
     private wConn: whatels.Connection;
-    private refreshTime: number;
+    private port: number;
 
-    constructor(refreshTime?:number) {
-        this.refreshTime = refreshTime || 1000;
+    constructor(refreshTime?: number, port?: number) {
+        this.port = port || 10998;
     }
 
-    public getSymbols(path: string, text: string): Thenable<whatels.Symbols> {
+    public getPathSymbols(path: string): Thenable<whatels.Symbols> {
         return new Promise<whatels.Symbols>((resolve, reject) => {
-            const now = (new Date()).getTime();
-            const sti: SymbolTimeInfo = this.pathSymbols[path];
-            if (sti && (now - sti.updated) < this.refreshTime) {
-                resolve(sti.symbols);
-            }
-            else {
-                this._getSymbols(path, text).then(symbols => resolve(symbols),
-                                                  err => reject(err));
-            }
+            this._connect().then(
+                conn => resolve(conn.getPathSymbols(path)),
+                err => reject(err)
+            )
         });
+    }
+
+    public getAllPathSymbols(): Thenable<{[index: string]: whatels.Symbols}> {
+        return new Promise<{[index: string]: whatels.Symbols}>((resolve, reject) => {
+            this._connect().then(
+                conn => resolve(conn.getAllPathSymbols()),
+                err => reject(err)
+            )
+        });
+    }
+
+    public watch(wildcard: string) {
+        console.log('watch: ', wildcard);
+        this._connect().then(
+            conn => {
+                conn.watch(wildcard);
+            },
+            err => console.error(err)
+        );
     }
 
     public dispose() {
         this.wConn.close();
         this.wConn = null;
-        this.pathSymbols = null;
     }
 
     private _connect(): Thenable<whatels.Connection> {
@@ -42,29 +49,12 @@ export class WhatelsClient implements Disposable {
                 resolve(this.wConn);
             }
             else {
-                this.wConn = new whatels.Connection();
+                this.wConn = new whatels.Connection(this.port);
                 this.wConn.connect().then(
                     () => resolve(this.wConn),
                     err => reject(err)
                 );
             }
-        });
-    }
-
-    private _getSymbols(path: string, text: string): Thenable<whatels.Symbols> {
-        return new Promise<whatels.Symbols>((resolve, reject) => {
-            this._connect().then(conn => {
-                conn.getSymbols(text).then(
-                    symbols => {
-                        console.log('SYMBOLS!!! ', symbols);
-                        const now = (new Date()).getTime();
-                        this.pathSymbols[path] = {updated: now, symbols: symbols};
-                        resolve(symbols);
-                    },
-                    err => reject(err)
-                );
-            },
-            err => reject(err));
         });
     }
 }
