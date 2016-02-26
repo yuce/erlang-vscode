@@ -105,9 +105,11 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
                 var module = pathSymbols[p];
                 if (module.functions) {
                     module.functions.forEach(f => {
-                        var item = new CompletionItem(f.name);
-                        item.kind = CompletionItemKind.Function;
-                        comps.push(item);
+                        if (f.exported) {
+                            var item = new CompletionItem(f.name);
+                            item.kind = CompletionItemKind.Function;
+                            comps.push(item);
+                        }
                     });
                 }
             }
