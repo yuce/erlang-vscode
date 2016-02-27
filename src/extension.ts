@@ -32,7 +32,7 @@
 import {ExtensionContext, Disposable, workspace, window, languages,
         Hover} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
-import {ErlangSymbolProvider} from './symbol_provider';
+import {ErlangDocumentSymbolProvider, ErlangWorkspaceDocumentSymbolProvider} from './symbol_provider';
 import {WhatelsClient} from './whatels_client';
 
 
@@ -74,7 +74,10 @@ export function activate(ctx: ExtensionContext) {
         }, new ErlangCompletionProvider(whatelsClient, completionJsonPath), ':'));
         ctx.subscriptions.push(languages.registerDocumentSymbolProvider({
             language: 'erlang'
-        }, new ErlangSymbolProvider(whatelsClient)));
+        }, new ErlangDocumentSymbolProvider(whatelsClient)));
+        ctx.subscriptions.push(languages.registerWorkspaceSymbolProvider(
+            new ErlangWorkspaceDocumentSymbolProvider(whatelsClient)
+        ));
     }
 }
 

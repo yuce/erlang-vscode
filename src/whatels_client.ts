@@ -2,12 +2,18 @@
 import {Disposable} from 'vscode';
 import whatels = require('whatels');
 
+
 export class WhatelsClient implements Disposable {
     private wConn: whatels.Connection;
     private port: number;
+    private subscribers: whatels.CallbackFunction[] = [];
 
     constructor(refreshTime?: number, port?: number) {
         this.port = port || 10998;
+    }
+
+    public subscribe(callback: whatels.CallbackFunction) {
+        this.subscribers.push(callback);
     }
 
     public getPathSymbols(path: string): Thenable<whatels.Symbols> {
@@ -44,13 +50,19 @@ export class WhatelsClient implements Disposable {
     }
 
     private _connect(): Thenable<whatels.Connection> {
+        let callback = (action: whatels.CallbackAction, msg: any) => {
+            this.subscribers.forEach(cb => {
+                cb(action, msg);
+            });
+        }
+
         return new Promise<whatels.Connection>((resolve, reject) => {
             if (this.wConn) {
                 resolve(this.wConn);
             }
             else {
                 this.wConn = new whatels.Connection(this.port);
-                this.wConn.connect().then(
+                this.wConn.connect(callback).then(
                     () => resolve(this.wConn),
                     err => reject(err)
                 );
