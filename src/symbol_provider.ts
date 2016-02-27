@@ -11,9 +11,10 @@ export class ErlangDocumentSymbolProvider implements DocumentSymbolProvider {
 
     constructor(private whatelsClient: WhatelsClient) {
         let cb = (action: CallbackAction, msg: any) => {
-            if (action == CallbackAction.getSymbols) {
-                console.log('ErlangDocumentSymbolProvider: Invalidating symbols');
+            if (action == CallbackAction.getSymbols && msg.path == this.symbolsPath) {
+                console.log(`ErlangDocumentSymbolProvider: Invalidating symbols - ${this.symbolsPath}`);
                 this.symbols = null;
+                this.symbolsPath = '';
             }
         }
         whatelsClient.subscribe(cb);
@@ -23,7 +24,7 @@ export class ErlangDocumentSymbolProvider implements DocumentSymbolProvider {
         :Thenable<SymbolInformation[]>
     {
         return new Promise<SymbolInformation[]>((resolve, reject) => {
-            console.log('get doc symbol informations');
+            console.log('ErlangDocumentSymbolProvider: get doc symbol informations');
             if (!this.symbols || this.symbolsPath != doc.fileName) {
                 this.whatelsClient.getPathSymbols(doc.fileName).then(
                     symbols => {
@@ -64,8 +65,8 @@ export class ErlangWorkspaceDocumentSymbolProvider implements WorkspaceSymbolPro
     constructor(private whatelsClient: WhatelsClient) {
         let cb = (action: CallbackAction, msg: any) => {
             if (action == CallbackAction.getSymbols) {
-                console.log('ErlangWorkspaceDocumentSymbolProvider: Invalidating symbols');
                 if (this.symbols) {
+                    console.log(`ErlangWorkspaceDocumentSymbolProvider: Invalidating symbols - ${msg.path}`);
                     this.symbols[msg.path] = null;
                 }
 
@@ -77,9 +78,8 @@ export class ErlangWorkspaceDocumentSymbolProvider implements WorkspaceSymbolPro
     public provideWorkspaceSymbols(query: string, token: CancellationToken)
         :SymbolInformation[] | Thenable<SymbolInformation[]>
     {
-        console.log('will provide workspace symbols');
         return new Promise<SymbolInformation[]>((resolve, reject) => {
-            console.log('get doc symbol informations');
+            console.log('ErlangWorkspaceDocumentSymbolProvider: get doc symbol informations');
             if (!this.symbols) {
                 this.whatelsClient.getAllPathSymbols().then(
                     symbols => {
