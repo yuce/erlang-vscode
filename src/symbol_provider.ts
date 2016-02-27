@@ -64,7 +64,7 @@ export class ErlangWorkspaceDocumentSymbolProvider implements WorkspaceSymbolPro
 
     constructor(private whatelsClient: WhatelsClient) {
         let cb = (action: CallbackAction, msg: any) => {
-            if (action == CallbackAction.getSymbols) {
+            if (action == CallbackAction.getSymbols || action == CallbackAction.discardPath) {
                 if (this.symbols) {
                     console.log(`ErlangWorkspaceDocumentSymbolProvider: Invalidating symbols - ${msg.path}`);
                     this.symbols[msg.path] = null;

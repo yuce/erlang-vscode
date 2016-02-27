@@ -17,6 +17,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private genericCompletionItems: CompletionItem[] = null;
     private moduleCompletionItems: CompletionItem[] = null;
     private stdLibCompletionItems: CompletionItem[] = null;
+    private workspaceCompletionItems: CompletionItem[] = null;
 
     constructor(private whatelsClient: WhatelsClient,
                 private completionPath: string)
@@ -29,6 +30,9 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
                     this.docPath = '';
                     this.moduleCompletionItems = null;
                 }
+            }
+            else if (action == CallbackAction.discardPath) {
+                this.genericCompletionItems = null;
             }
         });
     }
@@ -78,11 +82,13 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
             else {
                 let cis: CompletionItem[] = [];
                 Promise.all([this.getModuleCompletionItems(path),
+                             this.getWorkspaceCompletionItems(),
                              this.getStdLibCompletionItems()]).then(
                     allCompletionItems => {
                         allCompletionItems.forEach(items => {
                             items.forEach(ci => cis.push(ci));
                         });
+                        resolve(cis);
                     },
                     err => reject(err)
                 );
@@ -93,18 +99,17 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 
     private getModuleCompletionItems(path: string): Thenable<CompletionItem[]> {
         return new Promise<CompletionItem[]>((resolve, reject) => {
-            if (!this.moduleCompletionItems || path != this.docPath) {
+            if (this.moduleCompletionItems && path == this.docPath) {
+                resolve(this.moduleCompletionItems);
+            }
+            else {
                 this.whatelsClient.getPathSymbols(path).then(
                     symbols => {
                         this.docPath = path;
-                        this.createModuleCompletionItems(path, symbols);
-                        resolve(this.moduleCompletionItems);
+                        resolve(this.createModuleCompletionItems(path, symbols));
                     },
                     err => reject(err)
                 );
-            }
-            else {
-                resolve(this.moduleCompletionItems);
             }
         });
     }
@@ -117,8 +122,22 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
             else {
                 this.readCompletionJson(this.completionPath, modules => {
                     this.stdModules = modules;
-                    this.createStdLibCompletionItems(modules);
+                    resolve(this.createStdLibCompletionItems(modules));
                 });
+            }
+        });
+    }
+
+    private getWorkspaceCompletionItems(): Thenable<CompletionItem[]> {
+        return new Promise<CompletionItem[]>((resolve, reject) => {
+            if (this.workspaceCompletionItems) {
+                resolve(this.workspaceCompletionItems);
+            }
+            else {
+                this.whatelsClient.getAllPathSymbols().then(
+                    pathSymbols => resolve(this.createWorkspaceCompletionItems(pathSymbols)),
+                    err => reject(err)
+                );
             }
         });
     }
@@ -135,7 +154,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
                 cis.push(item);
             });
         }
-        this.moduleCompletionItems = cis;
+        return this.moduleCompletionItems = cis;
     }
 
     private createStdLibCompletionItems(modules) {
@@ -145,7 +164,20 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
             item.kind = CompletionItemKind.Module;
             cis.push(item);
         }
-        this.stdLibCompletionItems = cis;
+        return this.stdLibCompletionItems = cis;
+    }
+
+    private createWorkspaceCompletionItems(pathSymbols) {
+        let cis: CompletionItem[] = [];
+        for (var p in pathSymbols) {
+            var item = new CompletionItem(path.basename(p, '.erl'));
+            item.kind = CompletionItemKind.Module;
+            cis.push(item);
+        }
+        console.log('createWorkspaceCompletionItems');
+        console.log(cis);
+        console.log(this);
+        return this.workspaceCompletionItems = cis;
     }
 
     private readCompletionJson(filename: string, done: Function): any {
