@@ -32,7 +32,9 @@
 import {ExtensionContext, Disposable, workspace, window, languages,
         Hover} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
-// import {range, debounce} from 'lodash';
+import {ErlangDocumentSymbolProvider, ErlangWorkspaceDocumentSymbolProvider} from './symbol_provider';
+import {WhatelsClient} from './whatels_client';
+
 
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
@@ -64,13 +66,27 @@ export function activate(ctx: ExtensionContext) {
     // enable auto completion
     let config = workspace.getConfiguration('erlang');
     if (config['enableExperimentalAutoComplete']) {
-        let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+        const whatelsClient = createWhatelsClient(workspace.rootPath);
+        ctx.subscriptions.push(whatelsClient);
+        const completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
         ctx.subscriptions.push(languages.registerCompletionItemProvider({
             language: 'erlang'
-        }, new ErlangCompletionProvider(completionJsonPath), ':'));
+        }, new ErlangCompletionProvider(whatelsClient, completionJsonPath), ':'));
+        ctx.subscriptions.push(languages.registerDocumentSymbolProvider({
+            language: 'erlang'
+        }, new ErlangDocumentSymbolProvider(whatelsClient)));
+        ctx.subscriptions.push(languages.registerWorkspaceSymbolProvider(
+            new ErlangWorkspaceDocumentSymbolProvider(whatelsClient)
+        ));
     }
 }
 
 export function deactivate() {
 }
 
+function createWhatelsClient(rootPath: string) {
+    const wc = new WhatelsClient();
+    wc.watch(`${rootPath}/src/*.erl`);
+    wc.watch(`${rootPath}/apps/**/src/*.erl`);
+    return wc;
+}

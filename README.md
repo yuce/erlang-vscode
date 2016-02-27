@@ -1,6 +1,6 @@
 # Erlang/OTP Support for Visual Studio Code
 
-This extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/)and is available at the [Marketplace](https://marketplace.visualstudio.com/items?itemName=yuce.erlang-otp).
+This experimantal extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/).
 
 ## News
 
@@ -19,7 +19,6 @@ setting `erlang.enableExperimentalAutoComplete` to `true` in your user settings 
 ## Planned Features
 
 * Build support
-* Erlang shell
 
 ## Work In Progress
 
