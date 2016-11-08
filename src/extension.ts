@@ -29,13 +29,19 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'use strict';
-import {ExtensionContext, Disposable, workspace, window, languages,
-        Hover} from 'vscode';
-import {ErlangCompletionProvider} from './completion_provider';
-// import {range, debounce} from 'lodash';
+import * as vscode from 'vscode';
+import {ErlangCompletionProvider} from './provider/completion';
+import {EralngFormattingEditProvider} from './provider/formatter';
+import {EralngSettings} from './common/setting';
+import {ErlangOutput} from './common/output';
 
-export function activate(ctx: ExtensionContext) {
-    languages.setLanguageConfiguration('erlang', {
+const ERLANG: vscode.DocumentFilter = { language: 'erlang', scheme: 'file' };
+
+export function activate(ctx: vscode.ExtensionContext) {
+    let erlangOut = new ErlangOutput(vscode.window.createOutputChannel("erlang"));
+    let erlangSettings = EralngSettings.getInstance();
+
+    vscode.languages.setLanguageConfiguration(ERLANG.language, {
         indentationRules: {
             increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
             decreaseIndentPattern: /^.*(;|\.)\s*$/,
@@ -50,25 +56,25 @@ export function activate(ctx: ExtensionContext) {
             ['<<', '>>']
         ],
         __characterPairSupport: {
-			autoClosingPairs: [
-				{ open: '{', close: '}' },
-				{ open: '[', close: ']' },
-				{ open: '(', close: ')' },
-				{ open: '<<', close: '>>', notIn: ['string', 'comment'] },
-				{ open: '"', close: '"', notIn: ['string'] },
-				{ open: '\'', close: '\'', notIn: ['string', 'comment'] }
-			]
-		}
+            autoClosingPairs: [
+                { open: '{', close: '}' },
+                { open: '[', close: ']' },
+                { open: '(', close: ')' },
+                { open: '<<', close: '>>', notIn: ['string', 'comment'] },
+                { open: '"', close: '"', notIn: ['string'] },
+                { open: '\'', close: '\'', notIn: ['string', 'comment'] }
+            ]
+        }
     });
 
     // enable auto completion
-    let config = workspace.getConfiguration('erlang');
-    if (config['enableExperimentalAutoComplete']) {
-        let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
-        ctx.subscriptions.push(languages.registerCompletionItemProvider({
-            language: 'erlang'
-        }, new ErlangCompletionProvider(completionJsonPath), ':'));
+    if (erlangSettings.enableExperimentalAutoComplete) {
+        ctx.subscriptions.push(vscode.languages.registerCompletionItemProvider(ERLANG, new ErlangCompletionProvider(ctx), ':'));
     }
+
+    //formatting
+    const formatProvider = new EralngFormattingEditProvider(ctx, erlangOut, erlangSettings, vscode.workspace.rootPath);
+    ctx.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(ERLANG, formatProvider));
 }
 
 export function deactivate() {

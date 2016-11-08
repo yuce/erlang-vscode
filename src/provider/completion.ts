@@ -1,10 +1,7 @@
 /// <ref href="../typings/tsd.d.ts">
 
-
-import {CompletionItemProvider, TextDocument, Position, CancellationToken,
-        CompletionItem, CompletionItemKind} from 'vscode';
-
-let fs = require('fs');
+import * as vscode from 'vscode';
+import * as fs from 'fs';
 
 const RE_MODULE = /(\w+):$/;
 
@@ -13,30 +10,30 @@ interface FunctionCompletionData {
     // detail: string;
 }
 
-export class ErlangCompletionProvider implements CompletionItemProvider {
-    private modules:any = null;
+export class ErlangCompletionProvider implements vscode.CompletionItemProvider {
+    private modules: any = null;
     private moduleNames: string[] = null;
-    private genericCompletionItems: CompletionItem[] = null;
+    private genericCompletionItems: vscode.CompletionItem[] = null;
+    private completionPath: string;
 
-    constructor(private completionPath: string) {}
+    constructor(context: vscode.ExtensionContext) {
+        this.completionPath = context.asAbsolutePath("./priv/erlang-libs.json");
+    }
 
-    public provideCompletionItems(doc: TextDocument,
-                                  pos: Position,
-                                  token: CancellationToken): Thenable<CompletionItem[]>
-    {
-        return new Promise<CompletionItem[]>((resolve, reject) => {
-	        const line = doc.lineAt(pos.line);
+    public provideCompletionItems(doc: vscode.TextDocument, pos: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
+        return new Promise<vscode.CompletionItem[]>((resolve, reject) => {
+            const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
             if (this.modules === null) {
                 this.readCompletionJson(this.completionPath, modules => {
                     this.modules = modules;
-                    (m === null)?
+                    (m === null) ?
                         this.resolveModuleNames(resolve)
                         : this.resolveFunNames(m[1], resolve);
                 });
             }
             else {
-                (m === null)?
+                (m === null) ?
                     this.resolveModuleNames(resolve)
                     : this.resolveFunNames(m[1], resolve);
             }
@@ -44,7 +41,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     }
 
     private resolveFunNames(module, resolve) {
-	   resolve(this.makeModuleFunsCompletion(module));
+        resolve(this.makeModuleFunsCompletion(module));
     }
 
     private resolveModuleNames(resolve) {
@@ -54,27 +51,27 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         resolve(this.genericCompletionItems);
     }
 
-    private makeFunctionCompletionItem(name: string): CompletionItem {
-        const item = new CompletionItem(name);
+    private makeFunctionCompletionItem(name: string): vscode.CompletionItem {
+        const item = new vscode.CompletionItem(name);
         // item.documentation = cd.detail;
-        item.kind = CompletionItemKind.Function;
+        item.kind = vscode.CompletionItemKind.Function;
         return item;
     }
 
-    private makeModuleNameCompletionItem(name: string): CompletionItem {
-        const item = new CompletionItem(name);
-        item.kind = CompletionItemKind.Module;
+    private makeModuleNameCompletionItem(name: string): vscode.CompletionItem {
+        const item = new vscode.CompletionItem(name);
+        item.kind = vscode.CompletionItemKind.Module;
         return item;
     }
 
-    private makeModuleFunsCompletion(module: string): CompletionItem[] {
+    private makeModuleFunsCompletion(module: string): vscode.CompletionItem[] {
         const moduleFuns = this.modules[module] || [];
         return moduleFuns.map(name => {
             return this.makeFunctionCompletionItem(name);
         });
     }
 
-    private makeGenericCompletion(): CompletionItem[] {
+    private makeGenericCompletion(): vscode.CompletionItem[] {
         const modules = this.modules || {};
         const names = [];
         for (let k in modules) {
@@ -93,7 +90,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
                 done({});
             }
             else {
-                let d: any = JSON.parse(data);
+                let d: any = data.toJSON();
                 done(d);
             }
         });
