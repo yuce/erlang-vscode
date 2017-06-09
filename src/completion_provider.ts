@@ -18,7 +18,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private moduleNames: string[] = null;
     private genericCompletionItems: CompletionItem[] = null;
 
-    constructor(private completionPath: string) {}
+    constructor(private completionPath: string[]) {}
 
     public provideCompletionItems(doc: TextDocument,
                                   pos: Position,
@@ -28,11 +28,14 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 	        const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
             if (this.modules === null) {
-                this.readCompletionJson(this.completionPath, modules => {
-                    this.modules = modules;
-                    (m === null)?
-                        this.resolveModuleNames(resolve)
-                        : this.resolveFunNames(m[1], resolve);
+                this.readCompletionJson(this.completionPath[0], modules => {
+                    this.readCompletionJson(this.completionPath[1], workspaceModules => {
+                        this.modules = (workspaceModules === null) ? modules : Object.assign(modules, workspaceModules);
+
+                        (m === null)?
+                            this.resolveModuleNames(resolve)
+                            : this.resolveFunNames(m[1], resolve);
+                    });
                 });
             }
             else {

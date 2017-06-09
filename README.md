@@ -4,6 +4,7 @@ This extension provides Erlang/OTP support for [Visual Studio Code](https://code
 
 ## News
 
+* 2017-06-09: Experimental workspace modules and functions auto-completion
 * 2016-02-17: Experimental module name auto-completion (*currently Erlang standard library modules only*)
 * 2016-02-16: Added experimental support for auto-completion of Erlang standard library module functions. Enable it with
 setting `erlang.enableExperimentalAutoComplete` to `true` in your user settings and restart VSCode.
@@ -14,6 +15,10 @@ setting `erlang.enableExperimentalAutoComplete` to `true` in your user settings 
 * Auto-indent
 * Snippets
 * Auto-complete (*experimental*)
+
+Workspace auto-completion is based on file `.erl_workspace.json` in the workspace top folder. This file could be generated
+using the `Cmd+Shit+P` and `Erlang: generate workspace completions`. This file is generated with available *.beam under the current
+workspace.
 
 
 ## Planned Features

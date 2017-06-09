@@ -30,9 +30,12 @@
 
 'use strict';
 import {ExtensionContext, Disposable, workspace, window, languages,
-        Hover} from 'vscode';
+        Hover, commands} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
 // import {range, debounce} from 'lodash';
+
+var spawnCMD = require('spawn-command');
+var commandOutput = commandOutput = window.createOutputChannel('Shell');
 
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
@@ -64,13 +67,50 @@ export function activate(ctx: ExtensionContext) {
     // enable auto completion
     let config = workspace.getConfiguration('erlang');
     if (config['enableExperimentalAutoComplete']) {
+        ctx.subscriptions.push(commandOutput);
         let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+        let workspaceJsonPath = workspace.rootPath + "/.erl_workspace.json";
+        let wCompletions = ctx.asAbsolutePath("./priv/wcompletions");
+        let completionsCommand = commands.registerCommand('extension.wCompletions', () => {exec(wCompletions + " .", workspace.rootPath);});
         ctx.subscriptions.push(languages.registerCompletionItemProvider({
             language: 'erlang'
-        }, new ErlangCompletionProvider(completionJsonPath), ':'));
+        }, new ErlangCompletionProvider([completionJsonPath, workspaceJsonPath]), ':'));
     }
 }
 
 export function deactivate() {
 }
 
+function exec(cmd:string, cwd:string) {
+  if (!cmd) { return; }
+  commandOutput.clear();
+  commandOutput.appendLine(`> Running command \`${cmd}\`...`)
+  run(cmd, cwd).then(() => {
+    commandOutput.appendLine(`> Command \`${cmd}\` ran successfully.`);
+  }).catch((reason) => {
+    commandOutput.appendLine(`> ERROR: ${reason}`);
+    window.showErrorMessage(reason, 'Show Output')
+      .then((action) => { commandOutput.show(); });
+  });
+}
+
+function run(cmd:string, cwd:string) {
+  return new Promise((accept, reject) => {
+    var opts : any = {};
+    if (workspace) {
+      opts.cwd = cwd;
+    }
+    process = spawnCMD(cmd, opts);
+    function printOutput(data) { commandOutput.append(data.toString()); }
+    process.stdout.on('data', printOutput);
+    process.stderr.on('data', printOutput);
+    process.on('close', (status) => {
+      if (status) {
+        reject(`Command \`${cmd}\` exited with status code ${status}.`);
+      } else {
+        accept();
+      }
+      process = null;
+    });
+  });
+}
