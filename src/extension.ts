@@ -29,59 +29,75 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'use strict';
-import {ExtensionContext, Disposable, workspace, window, languages,
-        Hover, commands} from 'vscode';
-import {ErlangCompletionProvider} from './completion_provider';
+import {
+  ExtensionContext, Disposable, workspace, window, languages,
+  Hover, commands
+} from 'vscode';
+import { ErlangCompletionProvider } from './completion_provider';
+import { ErlangFormattingEditProvider } from './formatting_provider';
 // import {range, debounce} from 'lodash';
 
 var spawnCMD = require('spawn-command');
 var commandOutput = commandOutput = window.createOutputChannel('Shell');
 
 export function activate(ctx: ExtensionContext) {
-    languages.setLanguageConfiguration('erlang', {
-        indentationRules: {
-            increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
-            decreaseIndentPattern: /^.*(;|\.)\s*$/,
-        },
-        comments: {
-            lineComment: '%'
-        },
-        brackets: [
-            ['{', '}'],
-            ['[', ']'],
-            ['(', ')'],
-            ['<<', '>>']
-        ],
-        __characterPairSupport: {
-			autoClosingPairs: [
-				{ open: '{', close: '}' },
-				{ open: '[', close: ']' },
-				{ open: '(', close: ')' },
-				{ open: '<<', close: '>>', notIn: ['string', 'comment'] },
-				{ open: '"', close: '"', notIn: ['string'] },
-				{ open: '\'', close: '\'', notIn: ['string', 'comment'] }
-			]
-		}
-    });
-
-    // enable auto completion
-    let config = workspace.getConfiguration('erlang');
-    if (config['enableExperimentalAutoComplete']) {
-        ctx.subscriptions.push(commandOutput);
-        let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
-        let workspaceJsonPath = workspace.rootPath + "/.erl_workspace.json";
-        let wCompletions = ctx.asAbsolutePath("./priv/wcompletions");
-        let completionsCommand = commands.registerCommand('extension.wCompletions', () => {exec(wCompletions + " .", workspace.rootPath);});
-        ctx.subscriptions.push(languages.registerCompletionItemProvider({
-            language: 'erlang'
-        }, new ErlangCompletionProvider([completionJsonPath, workspaceJsonPath]), ':'));
+  languages.setLanguageConfiguration('erlang', {
+    indentationRules: {
+      increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
+      decreaseIndentPattern: /^.*(;|\.)\s*$/,
+    },
+    comments: {
+      lineComment: '%%'
+    },
+    brackets: [
+      ['{', '}'],
+      ['[', ']'],
+      ['(', ')'],
+      ['<<', '>>']
+    ],
+    __characterPairSupport: {
+      autoClosingPairs: [
+        { open: '{', close: '}' },
+        { open: '[', close: ']' },
+        { open: '(', close: ')' },
+        { open: '<<', close: '>>', notIn: ['string', 'comment'] },
+        { open: '"', close: '"', notIn: ['string'] },
+        { open: '\'', close: '\'', notIn: ['string', 'comment'] }
+      ]
     }
+  });
+
+  // enable auto completion
+  let config = workspace.getConfiguration('erlang');
+  if (config['enableExperimentalAutoComplete']) {
+    ctx.subscriptions.push(commandOutput);
+    let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
+    let workspaceJsonPath = workspace.rootPath + "/.erl_workspace.json";
+    let wCompletions = ctx.asAbsolutePath("./priv/wcompletions");
+
+    // rebar3 commands
+    let completionsCommand = commands.registerCommand('extension.wCompletions', () => { exec(wCompletions + " .", workspace.rootPath); });
+    let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { exec("rebar3 compile", workspace.rootPath); });
+    let rebar3CleanCommand = commands.registerCommand('extension.rebar3Clean', () => { exec("rebar3 clean", workspace.rootPath); });
+    let rebar3ReleaseCommand = commands.registerCommand('extension.rebar3Release', () => { exec("rebar3 release tar", workspace.rootPath); });
+    let rebar3CtCommand = commands.registerCommand('extension.rebar3Ct', () => { exec("rebar3 ct", workspace.rootPath); });
+    let rebar3EunitCommand = commands.registerCommand('extension.rebar3Eunit', () => { exec("rebar3 eunit", workspace.rootPath); });
+
+    // completion
+    ctx.subscriptions.push(languages.registerCompletionItemProvider({
+      language: 'erlang'
+    }, new ErlangCompletionProvider([completionJsonPath, workspaceJsonPath]), ':'));
+
+    // formatter
+    const formatProvider = new ErlangFormattingEditProvider(ctx);
+    ctx.subscriptions.push(languages.registerDocumentFormattingEditProvider({language: 'erlang'}, formatProvider));
+  }
 }
 
 export function deactivate() {
 }
 
-function exec(cmd:string, cwd:string) {
+function exec(cmd: string, cwd: string) {
   if (!cmd) { return; }
   commandOutput.clear();
   commandOutput.appendLine(`> Running command \`${cmd}\`...`)
@@ -94,9 +110,9 @@ function exec(cmd:string, cwd:string) {
   });
 }
 
-function run(cmd:string, cwd:string) {
+function run(cmd: string, cwd: string) {
   return new Promise((accept, reject) => {
-    var opts : any = {};
+    var opts: any = {};
     if (workspace) {
       opts.cwd = cwd;
     }

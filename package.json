@@ -57,6 +57,26 @@
 			{
 				"command": "extension.wCompletions",
 				"title": "Erlang: generate workspace completions"
+			},
+			{
+				"command": "extension.rebar3Compile",
+				"title": "Erlang: rebar3 compile"
+			},
+			{
+				"command": "extension.rebar3Clean",
+				"title": "Erlang: rebar3 clean"
+			},
+			{
+				"command": "extension.rebar3Release",
+				"title": "Erlang: rebar3 release tar"
+			},
+			{
+				"command": "extension.rebar3Ct",
+				"title": "Erlang: rebar3 ct"
+			},
+			{
+				"command": "extension.rebar3Eunit",
+				"title": "Erlang: rebar3 release eunit"
 			}
 		],
 		"configuration": {
@@ -83,6 +103,7 @@
 		"vscode": "^1.1.0"
 	},
 	"dependencies": {
+		"diff": "^3.2.0",
 		"spawn-command": "0.0.2-1"
 	},
 	"repository": {
