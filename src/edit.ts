@@ -75,7 +75,7 @@ export function getEdits(fileName: string, oldStr: string, newStr: string): File
         oldStr = oldStr.split('\r\n').join('\n');
         newStr = newStr.split('\r\n').join('\n');
     }
-    let unifiedDiffs: jsDiff.IUniDiff = jsDiff.structuredPatch(fileName, fileName, oldStr, newStr, '', '');
+    let unifiedDiffs: jsDiff.IUniDiff = jsDiff.structuredPatch(fileName, fileName, oldStr, newStr.trim(), '', '');
     let filePatches: FilePatch[] = parseUniDiffs([unifiedDiffs]);
     return filePatches[0];
 }
