@@ -71,7 +71,7 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         }
 
         for (var index = 1; index < params; index++) {
-            snippet.appendText(",");
+            snippet.appendText(", ");
             snippet.appendPlaceholder("Param" + (index + 1));
         }
 
