@@ -61,16 +61,16 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
         const item = new CompletionItem(name);
         // item.documentation = cd.detail;
         let [fun, arity] = name.split("/");
-        arity = parseInt(arity);
+        let params = parseInt(arity);
         let snippet = new SnippetString();
         snippet.appendText(fun);
         snippet.appendText("(");
 
-        if (arity > 0) {
+        if (params > 0) {
             snippet.appendPlaceholder("Param1");
         }
 
-        for (var index = 1; index < arity; index++) {
+        for (var index = 1; index < params; index++) {
             snippet.appendText(",");
             snippet.appendPlaceholder("Param" + (index + 1));
         }
