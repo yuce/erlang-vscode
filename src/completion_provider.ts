@@ -2,7 +2,7 @@
 
 
 import {CompletionItemProvider, TextDocument, Position, CancellationToken,
-        CompletionItem, CompletionItemKind} from 'vscode';
+        CompletionItem, CompletionItemKind, SnippetString} from 'vscode';
 
 let fs = require('fs');
 
@@ -60,6 +60,24 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private makeFunctionCompletionItem(name: string): CompletionItem {
         const item = new CompletionItem(name);
         // item.documentation = cd.detail;
+        let [fun, arity] = name.split("/");
+        arity = parseInt(arity);
+        let snippet = new SnippetString();
+        snippet.appendText(fun);
+        snippet.appendText("(");
+
+        if (arity > 0) {
+            snippet.appendPlaceholder("Param1");
+        }
+
+        for (var index = 1; index < arity; index++) {
+            snippet.appendText(",");
+            snippet.appendPlaceholder("Param" + (index + 1));
+        }
+
+        snippet.appendText(")");
+
+        item.insertText = snippet;
         item.kind = CompletionItemKind.Function;
         return item;
     }
