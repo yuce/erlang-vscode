@@ -38,7 +38,7 @@ import { ErlangFormattingEditProvider } from './formatting_provider';
 // import {range, debounce} from 'lodash';
 
 var spawnCMD = require('spawn-command');
-var commandOutput = commandOutput = window.createOutputChannel('Shell');
+var commandOutput = commandOutput = window.createOutputChannel('Erlang');
 
 export function activate(ctx: ExtensionContext) {
   languages.setLanguageConfiguration('erlang', {
