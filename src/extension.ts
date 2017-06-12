@@ -44,7 +44,7 @@ export function activate(ctx: ExtensionContext) {
   languages.setLanguageConfiguration('erlang', {
     indentationRules: {
       increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
-      decreaseIndentPattern: /^.*(;|\.)\s*$/,
+      decreaseIndentPattern: null,
     },
     comments: {
       lineComment: '%%'
