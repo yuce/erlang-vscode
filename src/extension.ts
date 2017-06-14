@@ -77,7 +77,7 @@ export function activate(ctx: ExtensionContext) {
 
     // rebar3 commands
     let completionsCommand = commands.registerCommand('extension.wCompletions', () => { exec(wCompletions + " .", workspace.rootPath); });
-    let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { exec("rebar3 compile", workspace.rootPath); });
+    let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { compile("rebar3 compile", workspace.rootPath, wCompletions); });
     let rebar3CleanCommand = commands.registerCommand('extension.rebar3Clean', () => { exec("rebar3 clean", workspace.rootPath); });
     let rebar3ReleaseCommand = commands.registerCommand('extension.rebar3Release', () => { exec("rebar3 release tar", workspace.rootPath); });
     let rebar3CtCommand = commands.registerCommand('extension.rebar3Ct', () => { exec("rebar3 ct", workspace.rootPath); });
@@ -95,6 +95,21 @@ export function activate(ctx: ExtensionContext) {
 }
 
 export function deactivate() {
+}
+
+
+function compile(cmd: string, cwd: string, wcompl: string) {
+  if (!cmd) { return; }
+  commandOutput.clear();
+  commandOutput.appendLine(`> Running command \`${cmd}\`...`)
+  run(cmd, cwd).then(() => {
+    commandOutput.appendLine(`> Command \`${cmd}\` ran successfully.`);
+    exec(wcompl + " .", workspace.rootPath);
+  }).catch((reason) => {
+    commandOutput.appendLine(`> ERROR: ${reason}`);
+    window.showErrorMessage(reason, 'Show Output')
+      .then((action) => { commandOutput.show(); });
+  });
 }
 
 function exec(cmd: string, cwd: string) {
