@@ -14,6 +14,7 @@ export class ErlangFormattingEditProvider implements DocumentFormattingEditProvi
     public provideDocumentFormattingEdits(document: TextDocument, options: FormattingOptions, token: CancellationToken): Thenable<TextEdit[]> {
         let tidy = this.context.asAbsolutePath("./priv/erl-indent");
         let cwd = workspace.rootPath;
+        document.save();
 
         return this.execFileInternal(tidy, [document.uri.fsPath], { cwd }, true).then(data => {
             let textEdits: TextEdit[] = [];
