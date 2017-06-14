@@ -18,7 +18,16 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private moduleNames: string[] = null;
     private genericCompletionItems: CompletionItem[] = null;
 
-    constructor(private completionPath: string[]) {}
+    constructor(private completionPath: string[]) {
+        fs.watchFile(this.completionPath[1], (curr, prev) => {
+            this.readCompletionJson(this.completionPath[0], modules => {
+                    this.readCompletionJson(this.completionPath[1], workspaceModules => {
+                        this.modules = (workspaceModules === null) ? modules : Object.assign(modules, workspaceModules);
+                    });
+                });
+        });
+
+    }
 
     public provideCompletionItems(doc: TextDocument,
                                   pos: Position,
