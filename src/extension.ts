@@ -131,7 +131,7 @@ function run(cmd: string, cwd: string) {
     if (workspace) {
       opts.cwd = cwd;
     }
-    process = spawnCMD(cmd, opts);
+    let process = spawnCMD(cmd, opts);
     function printOutput(data) { commandOutput.append(data.toString()); }
     process.stdout.on('data', printOutput);
     process.stderr.on('data', printOutput);
