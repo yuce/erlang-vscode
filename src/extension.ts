@@ -31,7 +31,7 @@
 'use strict';
 import {
   ExtensionContext, Disposable, workspace, window, languages,
-  Hover, commands
+  Hover, commands, IndentAction
 } from 'vscode';
 import { ErlangCompletionProvider } from './completion_provider';
 import { ErlangFormattingEditProvider } from './formatting_provider';
@@ -44,8 +44,14 @@ export function activate(ctx: ExtensionContext) {
   languages.setLanguageConfiguration('erlang', {
     indentationRules: {
       increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
-      decreaseIndentPattern: null,
+      decreaseIndentPattern: null
     },
+    onEnterRules: [
+      {
+        beforeText: /^.*(;|\.)\s*$/,
+        action: { indentAction: IndentAction.Outdent, }
+      }
+    ],
     comments: {
       lineComment: '%%'
     },
@@ -77,7 +83,7 @@ export function activate(ctx: ExtensionContext) {
 
     // rebar3 commands
     let completionsCommand = commands.registerCommand('extension.wCompletions', () => { exec(wCompletions + " .", workspace.rootPath); });
-    let cTgasCommand = commands.registerCommand('extension.cTags', () => { exec("ctags --file-scope=no -R --languages=erlang -f .tags", workspace.rootPath); });
+    let cTgasCommand = commands.registerCommand('extension.erlangCTags', () => { exec("ctags --file-scope=no -R --languages=erlang -f .tags", workspace.rootPath); });
     let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { compile("rebar3 compile", workspace.rootPath, wCompletions); });
     let rebar3CleanCommand = commands.registerCommand('extension.rebar3Clean', () => { exec("rebar3 clean", workspace.rootPath); });
     let rebar3ReleaseCommand = commands.registerCommand('extension.rebar3Release', () => { exec("rebar3 release tar", workspace.rootPath); });

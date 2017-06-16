@@ -59,7 +59,7 @@
 				"title": "Erlang: generate workspace completions"
 			},
 			{
-				"command": "extension.cTags",
+				"command": "extension.erlangCTags",
 				"title": "Erlang: generate ctags"
 			},
 			{

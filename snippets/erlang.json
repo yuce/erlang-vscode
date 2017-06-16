@@ -24,8 +24,8 @@
     "case": {
         "prefix": "case",
         "body": [
-        "case $1 of",
-        "\t$2 ->",
+            "case $1 of",
+            "\t$2 ->",
             "\t\t$3",
             "end$4"
         ],
@@ -55,5 +55,91 @@
             "end$5"
         ],
         "description": "try .. catch block"
+    },
+    "Module definition": {
+        "prefix": "mod",
+        "body": [
+            "%% =============================================================================",
+            "%% Copyright (C) NGINEO LIMITED 2011 - 2016. All rights reserved.",
+            "%% =============================================================================\n\n\n-module($1)."
+        ]
+    },
+    "Function definition": {
+        "prefix": "fun",
+        "body": [
+            "%% -----------------------------------------------------------------------------",
+            "%% @doc",
+            "%% @end",
+            "%% -----------------------------------------------------------------------------",
+            "-spec $1() -> any().\n",
+            "$1() ->",
+            "    ok."
+        ]
+    },
+    "List Comprehension": {
+        "prefix": "lc",
+        "body": [
+            "[X || X <- L]"
+        ]
+    },
+    "Export Directive": {
+        "prefix": "exp",
+        "body": [
+            "-export([$1/$2])."
+        ]
+    },
+    "Private Function": {
+        "prefix": "priv",
+        "body": [
+            "%% @private"
+        ]
+    },
+    "Banner": {
+        "prefix": "ban",
+        "body": [
+            "\n\n\n%% =============================================================================",
+            "%% $1",
+            "%% =============================================================================\n\n\n"
+        ]
+    },
+    "Edoc": {
+        "prefix": "doc",
+        "body": [
+            "%% -----------------------------------------------------------------------------",
+            "%% @doc",
+            "%% @end",
+            "%% -----------------------------------------------------------------------------"
+        ]
+    },
+    "Sidejob Worker": {
+        "prefix": "side",
+        "body": [
+            "%% =============================================================================",
+            "%% Copyright (C) NGINEO LIMITED 2011 - 2016. All rights reserved.",
+            "%% =============================================================================\n\n\n-module($1).",
+            "-behaviour(gen_server).",
+
+
+            "\n\n-record(state, {}).",
+            "-type state() :: #state{}.",
+            "\n\n\n%% API",
+            "\n\n\n%% GEN_SERVER CALLBACKS\n-export([init/1]).\n-export([handle_info/2]).\n-export([terminate/2]).\n-export([code_change/3]).\n-export([handle_call/3]).\n-export([handle_cast/2]).",
+            "\n\n\n%% =============================================================================",
+            "%% API",
+            "%% =============================================================================\n\n\n",
+            "\n\n\n%% =============================================================================",
+            "%% GEN_SERVER CALLBACKS",
+            "%% =============================================================================\n\n\n",
+            "init([?POOL_NAME]) ->\n    %% We've been called by sidejob_worker\n    %% We will be called via a a cast (handle_cast/2)\n    {ok, #state{pool_type = permanent}};",
+            "\ninit([Event]) ->\n    %% We've been called by sidejob_supervisor\n    %% We immediately timeout so that we find ourselfs in handle_info/2.\n    State = #state{\n        pool_type = transient,\n        event = Event\n    },\n    {ok, State, 0}.",
+            "\n\nhandle_call(Event, _From, State) ->\n    error_logger:error_report([\n        {reason, unsupported_event},\n        {event, Event}\n    ]),\n    {noreply, State}.",
+            "\n\nhandle_cast(Event, State) ->\n   try\n        %% your handling of event here ...\n        {noreply, State}\n    catch\n        throw:abort ->\n            {noreply, State};\n        _:Reason ->\n            error_logger:error_report([\n                {reason, Reason},\n                {stacktrace, erlang:get_stacktrace()}\n            ]),\n        {noreply, State}\n    end.",
+            "\n\nhandle_info(timeout, #state{pool_type = transient, event = Event} = State)\nwhen Event /= undefined ->\n    %% We've been spawned to handle this single event, so we should stop after\n    %% your handling of event here ...\n    {stop, normal, State};\n\nhandle_info(_Info, State) ->\n    {noreply, State}.",
+            "\n\nterminate(normal, _State) ->\n    ok;\nterminate(shutdown, _State) ->\n    ok;\nterminate({shutdown, _}, _State) ->\n    ok;\nterminate(_Reason, _State) ->\n    ok.",
+            "\n\ncode_change(_OldVsn, State, _Extra) ->\n    {ok, State}.",
+            "\n\n\n%% =============================================================================",
+            "%% PRIVATE",
+            "%% =============================================================================\n\n\n"
+        ]
     }
 }
