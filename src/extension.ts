@@ -77,6 +77,7 @@ export function activate(ctx: ExtensionContext) {
 
     // rebar3 commands
     let completionsCommand = commands.registerCommand('extension.wCompletions', () => { exec(wCompletions + " .", workspace.rootPath); });
+    let cTgasCommand = commands.registerCommand('extension.cTags', () => { exec("ctags --file-scope=no -R --languages=erlang -f .tags", workspace.rootPath); });
     let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { compile("rebar3 compile", workspace.rootPath, wCompletions); });
     let rebar3CleanCommand = commands.registerCommand('extension.rebar3Clean', () => { exec("rebar3 clean", workspace.rootPath); });
     let rebar3ReleaseCommand = commands.registerCommand('extension.rebar3Release', () => { exec("rebar3 release tar", workspace.rootPath); });

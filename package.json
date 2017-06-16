@@ -59,6 +59,10 @@
 				"title": "Erlang: generate workspace completions"
 			},
 			{
+				"command": "extension.cTags",
+				"title": "Erlang: generate ctags"
+			},
+			{
 				"command": "extension.rebar3Compile",
 				"title": "Erlang: rebar3 compile"
 			},
