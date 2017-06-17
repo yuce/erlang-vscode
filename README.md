@@ -17,10 +17,12 @@ setting `erlang.enableExperimentalAutoComplete` to `true` in your user settings 
 * Snippets
 * Auto-complete (*experimental*)
 * Rebar3 common commands
+* Format document (*needs emacs installed*)
+* Generate Erlang ctags (*needs ctags installed, for use with ctags plugin*)
 
 Workspace auto-completion is based on file `.erl_workspace.json` in the workspace top folder. This file could be generated
 using the `Cmd+Shit+P` and `Erlang: generate workspace completions`. This file is generated with available *.beam under the current
-workspace (it needs the project to be already built).
+workspace (it needs the project to be already built). The command `rebar` compile` within the editor triggers this automatically upon successful compile.
 
 
 ## Planned Features
