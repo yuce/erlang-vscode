@@ -29,17 +29,29 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'use strict';
-import {ExtensionContext, Disposable, workspace, window, languages,
-        Hover} from 'vscode';
+import {ExtensionContext, Disposable, workspace, window, languages, Hover, IndentAction} from 'vscode';
 import {ErlangCompletionProvider} from './completion_provider';
-// import {range, debounce} from 'lodash';
 
 export function activate(ctx: ExtensionContext) {
     languages.setLanguageConfiguration('erlang', {
         indentationRules: {
-            increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch)\s*$/,
-            decreaseIndentPattern: /^.*(;|\.)\s*$/,
+            increaseIndentPattern: /^\s*catch\s*$/,
+            decreaseIndentPattern: /\s+(?:end[.,;]?|catch)\s*$/,
         },
+        onEnterRules: [
+            {
+                beforeText: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of)\s*$/,
+                action: {
+                    indentAction: IndentAction.Indent
+                }
+            },
+            {
+                beforeText: /^\s*((?!(end|catch))[^,])*$/,
+                action: {
+                    indentAction: IndentAction.Outdent
+                }
+            }
+        ],
         comments: {
             lineComment: '%'
         },
