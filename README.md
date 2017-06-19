@@ -18,7 +18,7 @@ setting `erlang.enableExperimentalAutoComplete` to `true` in your user settings 
 * Auto-complete (*experimental*)
 * Rebar3 common commands
 * Format document (*needs emacs installed*)
-* Generate Erlang ctags (*needs ctags installed, for use with ctags plugin*)
+* Generate Erlang ctags (*needs ctags installed, for use with [ctags plugin](https://marketplace.visualstudio.com/items?itemName=jtanx.ctagsx) *)
 
 Workspace auto-completion is based on file `.erl_workspace.json` in the workspace top folder. This file could be generated
 using the `Cmd+Shit+P` and `Erlang: generate workspace completions`. This file is generated with available *.beam under the current
