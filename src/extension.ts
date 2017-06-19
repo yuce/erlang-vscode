@@ -80,10 +80,11 @@ export function activate(ctx: ExtensionContext) {
     let completionJsonPath = ctx.asAbsolutePath("./priv/erlang-libs.json");
     let workspaceJsonPath = workspace.rootPath + "/.erl_workspace.json";
     let wCompletions = ctx.asAbsolutePath("./priv/wcompletions");
+    let erlTags = ctx.asAbsolutePath("./priv/vim-erlang-tags.erl");
 
     // rebar3 commands
     let completionsCommand = commands.registerCommand('extension.wCompletions', () => { exec(wCompletions + " .", workspace.rootPath); });
-    let cTgasCommand = commands.registerCommand('extension.erlangCTags', () => { exec("ctags --file-scope=no -R --languages=erlang -f .tags", workspace.rootPath); });
+    let cTgasCommand = commands.registerCommand('extension.erlangCTags', () => { exec(erlTags, workspace.rootPath); });
     let rebar3CompileCommand = commands.registerCommand('extension.rebar3Compile', () => { compile("rebar3 compile", workspace.rootPath, wCompletions); });
     let rebar3CleanCommand = commands.registerCommand('extension.rebar3Clean', () => { exec("rebar3 clean", workspace.rootPath); });
     let rebar3ReleaseCommand = commands.registerCommand('extension.rebar3Release', () => { exec("rebar3 release tar", workspace.rootPath); });
