@@ -2,7 +2,7 @@
 
 
 import {CompletionItemProvider, TextDocument, Position, CancellationToken,
-        CompletionItem, CompletionItemKind} from 'vscode';
+        CompletionItem, CompletionItemKind, SnippetString} from 'vscode';
 
 let fs = require('fs');
 
@@ -18,7 +18,16 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private moduleNames: string[] = null;
     private genericCompletionItems: CompletionItem[] = null;
 
-    constructor(private completionPath: string) {}
+    constructor(private completionPath: string[]) {
+        fs.watchFile(this.completionPath[1], (curr, prev) => {
+            this.readCompletionJson(this.completionPath[0], modules => {
+                    this.readCompletionJson(this.completionPath[1], workspaceModules => {
+                        this.modules = (workspaceModules === null) ? modules : Object.assign(modules, workspaceModules);
+                    });
+                });
+        });
+
+    }
 
     public provideCompletionItems(doc: TextDocument,
                                   pos: Position,
@@ -28,11 +37,14 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
 	        const line = doc.lineAt(pos.line);
             const m = RE_MODULE.exec(line.text.substring(0, pos.character));
             if (this.modules === null) {
-                this.readCompletionJson(this.completionPath, modules => {
-                    this.modules = modules;
-                    (m === null)?
-                        this.resolveModuleNames(resolve)
-                        : this.resolveFunNames(m[1], resolve);
+                this.readCompletionJson(this.completionPath[0], modules => {
+                    this.readCompletionJson(this.completionPath[1], workspaceModules => {
+                        this.modules = (workspaceModules === null) ? modules : Object.assign(modules, workspaceModules);
+
+                        (m === null)?
+                            this.resolveModuleNames(resolve)
+                            : this.resolveFunNames(m[1], resolve);
+                    });
                 });
             }
             else {
@@ -57,6 +69,24 @@ export class ErlangCompletionProvider implements CompletionItemProvider {
     private makeFunctionCompletionItem(name: string): CompletionItem {
         const item = new CompletionItem(name);
         // item.documentation = cd.detail;
+        let [fun, arity] = name.split("/");
+        let params = parseInt(arity);
+        let snippet = new SnippetString();
+        snippet.appendText(fun);
+        snippet.appendText("(");
+
+        if (params > 0) {
+            snippet.appendPlaceholder("Param1");
+        }
+
+        for (var index = 1; index < params; index++) {
+            snippet.appendText(", ");
+            snippet.appendPlaceholder("Param" + (index + 1));
+        }
+
+        snippet.appendText(")");
+
+        item.insertText = snippet;
         item.kind = CompletionItemKind.Function;
         return item;
     }

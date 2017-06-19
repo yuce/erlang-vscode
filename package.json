@@ -2,70 +2,121 @@
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
 	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
-	"version": "0.2.1",
-    "author": {
-        "name": "Yuce Tekol"
-    },
+	"version": "0.2.2-1",
+	"author": {
+		"name": "Yuce Tekol"
+	},
 	"publisher": "yuce",
-    "license": "SEE LICENSE IN LICENSE.md",
+	"license": "SEE LICENSE IN LICENSE.md",
 	"engines": {
-		"vscode": "^0.10.6"
+		"vscode": "^1.10.0"
 	},
 	"categories": [
 		"Languages",
-        "Snippets"
+		"Snippets"
 	],
 	"activationEvents": [
 		"onLanguage:erlang"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
-		"languages": [{
-			"id": "erlang",
-			"aliases": ["Erlang", "erlang"],
-			"extensions": [".erl", ".hrl", ".yrl", ".escript", ".app.src", ".config"],
-            "filenames": [
-                "rebar.lock"
-            ]
-		}],
-		"grammars": [{
-			"language": "erlang",
-			"scopeName": "source.erlang",
-			"path": "./syntaxes/erlang.tmLanguage"
-		}],
-        "snippets": [
-            {
-                "language": "erlang",
-                "path": "./snippets/erlang.json"
-            }
-        ],
-        "configuration": {
-            "title": "Erlang configuration",
-            "properties": {
-                    "erlang.enableExperimentalAutoComplete": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Enables experimental auto completion for Erlang standard library"
-                }
-            }
-        }
+		"languages": [
+			{
+				"id": "erlang",
+				"aliases": [
+					"Erlang",
+					"erlang"
+				],
+				"extensions": [
+					".erl",
+					".hrl",
+					".yrl",
+					".escript",
+					".app.src",
+					".config"
+				],
+				"filenames": [
+					"rebar.lock"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "erlang",
+				"scopeName": "source.erlang",
+				"path": "./syntaxes/erlang.tmLanguage"
+			}
+		],
+		"snippets": [
+			{
+				"language": "erlang",
+				"path": "./snippets/erlang.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "extension.wCompletions",
+				"title": "Erlang: generate workspace completions"
+			},
+			{
+				"command": "extension.erlangCTags",
+				"title": "Erlang: generate ctags"
+			},
+			{
+				"command": "extension.rebar3Compile",
+				"title": "Erlang: rebar3 compile"
+			},
+			{
+				"command": "extension.rebar3Clean",
+				"title": "Erlang: rebar3 clean"
+			},
+			{
+				"command": "extension.rebar3Release",
+				"title": "Erlang: rebar3 release tar"
+			},
+			{
+				"command": "extension.rebar3Ct",
+				"title": "Erlang: rebar3 ct"
+			},
+			{
+				"command": "extension.rebar3Eunit",
+				"title": "Erlang: rebar3 release eunit"
+			}
+		],
+		"configuration": {
+			"title": "Erlang configuration",
+			"properties": {
+				"erlang.enableExperimentalAutoComplete": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables experimental auto completion for Erlang standard library"
+				}
+			}
+		}
 	},
 	"scripts": {
-		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install"
 	},
 	"devDependencies": {
-		"typescript": "^1.7.5",
-		"vscode": "^0.11.0"
+		"@types/mocha": "^2.2.41",
+		"@types/node": "^7.0.29",
+		"mocha": "^3.4.2",
+		"typescript": "^2.3.4",
+		"vscode": "^1.1.0"
 	},
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/yuce/erlang-vscode"
-    },
-    "icon": "images/erlang.png",
-    "bugs": {
-        "url": "https://github.com/yuce/erlang-vscode/issues"
-    },
-    "homepage": "https://github.com/yuce/erlang-vscode/README.md"
+	"dependencies": {
+		"diff": "^3.2.0",
+		"spawn-command": "0.0.2-1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/yuce/erlang-vscode"
+	},
+	"icon": "images/erlang.png",
+	"bugs": {
+		"url": "https://github.com/yuce/erlang-vscode/issues"
+	},
+	"homepage": "https://github.com/yuce/erlang-vscode/README.md"
 }

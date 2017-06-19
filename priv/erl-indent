@@ -1,0 +1,35 @@
+#!/bin/sh
+# File: erl-indent
+# Opens a set of files in emacs and executes the emacs-indent-function.
+# Assumes the function named emacs-indent-function is defined in the
+# file named emacs-indent-file.
+#
+# adapted from http://www.cslab.pepperdine.edu/warford/BatchIndentationEmacs.html
+
+SCRIPT_DIR=`dirname $0`
+
+if [ $# -eq 0 ]
+then
+   echo "erl-indent requires at least one argument." 1>&2
+   echo "Usage: erl-indent files-to-indent" 1>&2
+   exit 1
+fi
+while [ $# -ge 1 ]
+do
+   if [ -d $1 ]
+   then
+      echo "Argument of erl-indent $1 cannot be a directory." 1>&2
+      exit 1
+   fi
+   # Check for existence of file:
+   ls $1 2> /dev/null | grep $1 > /dev/null
+   if [ $? != 0 ]
+   then
+      echo "erl-indent: $1 not found." 1>&2
+      exit 1
+   fi
+   emacs -batch $1 -l $SCRIPT_DIR/emacs-indent-erlang.el -f emacs-indent-function 2>/dev/null
+   echo
+   shift 1
+done
+exit 0
