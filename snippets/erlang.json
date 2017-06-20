@@ -15,8 +15,8 @@
             "receive",
             "\t$1 ->",
             "\t\t$2",
-            "after $3 ->",
-            "\t$4",
+            "\tafter $3 ->",
+            "\t\t$4",
             "end$5"
         ],
         "description": "receive block with after"
@@ -24,8 +24,8 @@
     "case": {
         "prefix": "case",
         "body": [
-        "case $1 of",
-        "\t$2 ->",
+            "case $1 of",
+            "\t$2 ->",
             "\t\t$3",
             "end$4"
         ],

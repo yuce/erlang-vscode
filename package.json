@@ -2,7 +2,7 @@
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
 	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
-	"version": "0.2.1",
+	"version": "0.2.2",
     "author": {
         "name": "Yuce Tekol"
     },
@@ -42,11 +42,16 @@
         "configuration": {
             "title": "Erlang configuration",
             "properties": {
-                    "erlang.enableExperimentalAutoComplete": {
+				"erlang.enableExperimentalAutoComplete": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enables experimental auto completion for Erlang standard library"
-                }
+                },
+				"erlang.autoIndent": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables auto indent"
+				}
             }
         }
 	},
