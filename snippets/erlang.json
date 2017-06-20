@@ -16,7 +16,7 @@
             "\t$1 ->",
             "\t\t$2",
             "\tafter $3 ->",
-            "\t\t$4",
+            "\t\t0$4",
             "end$5"
         ],
         "description": "receive block with after"
