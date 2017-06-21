@@ -1,10 +1,12 @@
 # Erlang/OTP Support for Visual Studio Code
 
-This extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/)and is available at the [Marketplace](https://marketplace.visualstudio.com/items?itemName=yuce.erlang-otp).
+This extension provides Erlang/OTP support for [Visual Studio Code](https://code.visualstudio.com/) and is available at the [Marketplace](https://marketplace.visualstudio.com/items?itemName=yuce.erlang-otp).
 
 ## News
 
-* 2017-06-18:
+* 0.2.3 (*2017-06-21*):
+    * Fixed `erlang.autoIndent` preference item.
+* 0.2.2 (*2017-06-18*):
     * Improved auto-indent. This feature is enabled by default; in order to disable it, set `erlang.autoIndent` to `false`.
 * 2016-02-17:
     * Experimental module name auto-completion (*currently Erlang standard library modules only*)
@@ -17,11 +19,6 @@ This extension provides Erlang/OTP support for [Visual Studio Code](https://code
 * Auto-indent
 * Snippets
 * Auto-complete (*experimental*)
-
-## Planned Features
-
-* Build support
-* Erlang shell
 
 ## Work In Progress
 
