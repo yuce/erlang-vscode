@@ -4,7 +4,7 @@ This extension provides Erlang/OTP support for [Visual Studio Code](https://code
 
 ## News
 
-* 0.2.3:
+* 0.2.3 (*2017-06-21*):
     * Fixed `erlang.autoIndent` preference item.
 * 0.2.2 (*2017-06-18*):
     * Improved auto-indent. This feature is enabled by default; in order to disable it, set `erlang.autoIndent` to `false`.
