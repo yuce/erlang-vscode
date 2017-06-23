@@ -59,8 +59,8 @@ export function activate(ctx: ExtensionContext) {
 
     if (config['autoIndent']) {
         languageConfiguration['indentationRules'] = {
-            increaseIndentPattern: /^\s*catch\s*$/,
-            decreaseIndentPattern: /\s+(?:end[.,;]?|catch)\s*$/,
+            increaseIndentPattern: /^\s*(catch|after)\s*$/,
+            decreaseIndentPattern: /\s+(?:end[.,;]?|catch|after)\s*$/,
         }
         languageConfiguration['onEnterRules'] = [
             {
@@ -70,7 +70,7 @@ export function activate(ctx: ExtensionContext) {
                 }
             },
             {
-                beforeText: /^\s*((?!(end|catch))[^,])*$/,
+                beforeText: /^\s*((?!(end|catch|after))[^,])*$/,
                 action: {
                     indentAction: IndentAction.Outdent
                 }

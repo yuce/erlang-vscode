@@ -2,14 +2,14 @@
 	"name": "erlang-otp",
 	"displayName": "Erlang/OTP",
 	"description": "Erlang/OTP support with syntax highlighting, auto-indent and snippets",
-	"version": "0.2.3",
+	"version": "0.2.4",
     "author": {
         "name": "Yuce Tekol"
     },
 	"publisher": "yuce",
     "license": "SEE LICENSE IN LICENSE.md",
 	"engines": {
-		"vscode": "^0.10.6"
+		"vscode": ">=1.0.0"
 	},
 	"categories": [
 		"Languages",
@@ -61,8 +61,8 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
 	},
 	"devDependencies": {
-		"typescript": "^1.7.5",
-		"vscode": "^0.11.0"
+		"typescript": ">=2.0.0",
+		"vscode": ">=1.0.0"
 	},
     "repository": {
         "type": "git",

@@ -4,6 +4,8 @@ This extension provides Erlang/OTP support for [Visual Studio Code](https://code
 
 ## News
 
+* 0.2.4 (*2017-06-23*):
+    * Fixed receive ... after auto-indent and snippet.
 * 0.2.3 (*2017-06-21*):
     * Fixed `erlang.autoIndent` preference item.
 * 0.2.2 (*2017-06-18*):
