@@ -59,8 +59,10 @@ export function activate(ctx: ExtensionContext) {
 
     if (config['autoIndent']) {
         languageConfiguration['indentationRules'] = {
-            increaseIndentPattern: /^\s*(catch|after)\s*$/,
-            decreaseIndentPattern: /\s+(?:end[.,;]?|catch|after)\s*$/,
+            increaseIndentPattern: /^\s*([^%]*->|receive|if|fun|case\s+.*\s+of|try\s+.*\s+of|catch|after)\s*$/,
+            // decreaseIndentPattern: /\s+(?:end[.,;]?|catch|after)\s*$/
+            decreaseIndentPattern: /\s+(?:end[.,;]?|catch|after)\s*$/
+            // decreaseIndentPattern: null
         }
         languageConfiguration['onEnterRules'] = [
             {
